@@ -73,3 +73,33 @@ print("      PASSED ✓")
 
 print("-" * 40)
 print("All tests passed.")
+# ── JEPA Model ────────────────────────────────────────────────────────
+print("[4/4] Testing MiniIJEPA...")
+from src.models.jepa import MiniIJEPA
+
+cfg = JEPAConfig()
+model = MiniIJEPA(cfg).to(device)
+
+# dummy batch — 2 images
+images = torch.randn(2, 3, 224, 224).to(device)
+
+# dummy indices — first 98 patches as context, next 20 as target
+context_indices = torch.arange(98).unsqueeze(0).expand(2, -1).to(device)
+target_indices = torch.arange(98, 118).unsqueeze(0).expand(2, -1).to(device)
+
+loss = model(images, context_indices, target_indices)
+assert loss.item() > 0, "Loss should be positive"
+print("      Loss              :", round(loss.item(), 4))
+
+# test EMA update runs without error
+model.update_target_encoder()
+print("      EMA update        : OK")
+
+# confirm target encoder has no gradients
+for p in model.target_encoder.parameters():
+    assert not p.requires_grad, "Target encoder should be frozen"
+print("      Target frozen     : OK")
+print("      PASSED ✓")
+
+print("-" * 40)
+print("All tests passed.")
