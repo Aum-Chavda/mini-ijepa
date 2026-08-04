@@ -103,3 +103,24 @@ print("      PASSED ✓")
 
 print("-" * 40)
 print("All tests passed.")
+# ── Masking ───────────────────────────────────────────────────────────
+print("[5/5] Testing masking...")
+from src.utils.masking import MultiBlockMaskGenerator
+
+mask_gen = MultiBlockMaskGenerator(cfg)
+ctx_idx, tgt_idx = mask_gen(batch_size=2)
+
+print("      context_indices shape:", ctx_idx.shape)
+print("      target_indices  shape:", tgt_idx.shape)
+
+# context and target should not overlap for each sample
+for i in range(2):
+    ctx_set = set(x for x in ctx_idx[i].tolist() if x >= 0)
+    tgt_set = set(x for x in tgt_idx[i].tolist() if x >= 0)
+    overlap = ctx_set & tgt_set
+    assert len(overlap) == 0, f"Sample {i} has overlap: {overlap}"
+
+print("      No context/target overlap: OK")
+assert ctx_idx.shape[0] == 2, "Batch size should be 2"
+assert tgt_idx.shape[0] == 2, "Batch size should be 2"
+print("      PASSED ✓")
