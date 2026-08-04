@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+src/__init__.py
+src/data/__init__.py
+src/mini_ijepa.egg-info/PKG-INFO
+src/mini_ijepa.egg-info/SOURCES.txt
+src/mini_ijepa.egg-info/dependency_links.txt
+src/mini_ijepa.egg-info/requires.txt
+src/mini_ijepa.egg-info/top_level.txt
+src/models/__init__.py
+src/models/base.py
+src/training/__init__.py
+src/utils/__init__.py
+src/utils/config.py
+tests/test_base.py
