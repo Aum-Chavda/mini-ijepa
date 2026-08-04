@@ -42,3 +42,34 @@ except TypeError:
 
 print("-" * 40)
 print("All tests passed.")
+
+# ── Blocks ────────────────────────────────────────────────────────────
+print("[3/3] Testing blocks...")
+from src.models.blocks import PatchEmbed, MultiHeadSelfAttention, TransformerBlock
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# PatchEmbed
+x = torch.randn(2, 3, 224, 224).to(device)
+patch_embed = PatchEmbed(image_size=224, patch_size=16, embed_dim=192).to(device)
+out = patch_embed(x)
+assert out.shape == (2, 196, 192), f"PatchEmbed shape wrong: {out.shape}"
+print("      PatchEmbed output :", out.shape)
+
+# MultiHeadSelfAttention
+x = torch.randn(2, 196, 192).to(device)
+attn = MultiHeadSelfAttention(embed_dim=192, num_heads=3).to(device)
+out = attn(x)
+assert out.shape == (2, 196, 192), f"MHSA shape wrong: {out.shape}"
+print("      Attention output  :", out.shape)
+
+# TransformerBlock
+x = torch.randn(2, 196, 192).to(device)
+block = TransformerBlock(embed_dim=192, num_heads=3).to(device)
+out = block(x)
+assert out.shape == (2, 196, 192), f"TransformerBlock shape wrong: {out.shape}"
+print("      TransformerBlock  :", out.shape)
+print("      PASSED ✓")
+
+print("-" * 40)
+print("All tests passed.")
