@@ -152,3 +152,55 @@ print(f"      Batch target     : {tgt.shape}")
 
 assert images.shape == (cfg.batch_size, 3, 224, 224)
 print("      PASSED ✓")
+# ── Metrics ───────────────────────────────────────────────────────────
+print("[7/7] Testing metrics...")
+from src.training.metrics import AverageMeter, MetricTracker
+
+# AverageMeter
+meter = AverageMeter("loss")
+meter.update(1.0, n=32)
+meter.update(0.5, n=32)
+assert abs(meter.avg - 0.75) < 1e-5, f"Wrong avg: {meter.avg}"
+print(f"      AverageMeter avg : {meter.avg:.4f} (expected 0.7500)")
+
+# MetricTracker
+tracker = MetricTracker()
+tracker.update(loss=1.0, batch_size=32)
+tracker.update(loss=0.5, batch_size=32)
+record = tracker.end_epoch(epoch=1, probe_acc=0.423)
+assert record["loss"] == 0.75
+assert record["probe_acc"] == 0.423
+print(f"      Epoch record     : {record}")
+print(f"      Best loss        : {tracker.best_loss()}")
+print("      PASSED ✓")
+# ── Callbacks ─────────────────────────────────────────────────────────
+print("[8/8] Testing callbacks...")
+from src.training.callbacks import (
+    CallbackProtocol, CheckpointSaver, EarlyStopping, CallbackRunner
+)
+
+# CheckpointSaver — saves when loss improves
+saver = CheckpointSaver(model=model, save_dir="checkpoints/test")
+assert isinstance(saver, CallbackProtocol), "CheckpointSaver must match Protocol"
+
+saver.on_epoch_end(epoch=1, metrics={"loss": 1.2})
+saver.on_epoch_end(epoch=2, metrics={"loss": 0.9})   # should save
+saver.on_epoch_end(epoch=3, metrics={"loss": 1.1})   # should not save
+assert saver.best_loss == 0.9, f"Wrong best loss: {saver.best_loss}"
+print(f"      CheckpointSaver best_loss: {saver.best_loss}")
+
+# EarlyStopping
+stopper = EarlyStopping(patience=3)
+stopper.on_epoch_end(epoch=1, metrics={"loss": 1.0})
+stopper.on_epoch_end(epoch=2, metrics={"loss": 1.1})
+stopper.on_epoch_end(epoch=3, metrics={"loss": 1.2})
+stopper.on_epoch_end(epoch=4, metrics={"loss": 1.3})  # patience exceeded
+assert stopper.should_stop == True, "EarlyStopping should have triggered"
+print(f"      EarlyStopping triggered  : {stopper.should_stop}")
+
+# CallbackRunner
+runner = CallbackRunner([saver, stopper])
+runner.on_epoch_end(epoch=5, metrics={"loss": 0.5})
+runner.on_train_end()
+print("      CallbackRunner fan-out   : OK")
+print("      PASSED ✓")
