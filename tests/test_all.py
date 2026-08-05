@@ -124,3 +124,31 @@ print("      No context/target overlap: OK")
 assert ctx_idx.shape[0] == 2, "Batch size should be 2"
 assert tgt_idx.shape[0] == 2, "Batch size should be 2"
 print("      PASSED ✓")
+# ── Dataset ───────────────────────────────────────────────────────────
+print("[6/6] Testing dataset...")
+from src.data.dataset import STL10JEPADataset, build_dataloader
+
+# dataset will download STL-10 on first run (~2.6GB) — be patient
+print("      Loading STL-10 (downloads if not cached)...")
+dataset = STL10JEPADataset(cfg, split="unlabeled", download=True)
+print(f"      Dataset size     : {len(dataset)}")
+
+# test one sample
+image, ctx_idx, tgt_idx = dataset[0]
+print(f"      Image shape      : {image.shape}")
+print(f"      Context indices  : {ctx_idx.shape}")
+print(f"      Target indices   : {tgt_idx.shape}")
+
+assert image.shape == (3, 224, 224), f"Wrong image shape: {image.shape}"
+assert ctx_idx.shape[0] > 0, f"Context indices empty: {ctx_idx.shape}"
+assert ctx_idx.shape[0] <= cfg.num_patches, f"Context too large: {ctx_idx.shape}"
+
+# test dataloader — one batch
+loader = build_dataloader(cfg, split="unlabeled")
+images, ctx, tgt = next(iter(loader))
+print(f"      Batch images     : {images.shape}")
+print(f"      Batch context    : {ctx.shape}")
+print(f"      Batch target     : {tgt.shape}")
+
+assert images.shape == (cfg.batch_size, 3, 224, 224)
+print("      PASSED ✓")
