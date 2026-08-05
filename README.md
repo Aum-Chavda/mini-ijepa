@@ -266,7 +266,7 @@ If the encoder learned to output zeros everywhere, the loss would be zero too. T
 ## Project Phases
 
 - [x] Phase 1 — Config + ABCs + Blocks + Full JEPA model
-- [ ] Phase 2 — Data pipeline (STL-10)
+- [x] Phase 2 — Data pipeline (STL-10)
 - [ ] Phase 3 — Training loop + EMA + callbacks
 - [ ] Phase 4 — Linear probe evaluation + visualisation
 
@@ -281,14 +281,6 @@ If the encoder learned to output zeros everywhere, the loss would be zero too. T
 | Peak VRAM | TBD | target < 3.5 GB |
 
 ---
-
-## Key Engineering Lessons
-
-- `uv` requires explicit PyTorch index configuration in `pyproject.toml` — never rely on `uv add torch` alone for CUDA builds
-- EMA update must be called **manually** after each optimizer step — it is not part of the compute graph
-- Target encoder parameters must have `requires_grad = False` set at init — optimizer must never see them
-- Predictor bottleneck (96 dim) is intentional — removing it causes representational collapse
-
 ---
 
 ## Literature Review
