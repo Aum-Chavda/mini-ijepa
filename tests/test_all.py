@@ -7,6 +7,8 @@ Each section tests one module. Add new tests below as we build.
 import sys
 import torch
 
+RUN_ONLY = int(sys.argv[1]) if len(sys.argv) > 1 else None
+
 print(f"Python: {sys.version}")
 print(f"Torch:  {torch.__version__}")
 print(f"CUDA:   {torch.cuda.is_available()}")
@@ -25,6 +27,8 @@ print("      num_context_patches:", cfg.num_context_patches)
 print("      embed_dim         :", cfg.embed_dim)
 print("      PASSED ✓")
 
+if RUN_ONLY is None or RUN_ONLY == 1:
+    print("[1/10] Testing config...")
 # ── Base ABCs ─────────────────────────────────────────────────────────
 print("[2/2] Testing base ABCs...")
 from src.models.base import BaseEncoder, BasePredictor
@@ -42,6 +46,9 @@ except TypeError:
 
 print("-" * 40)
 print("All tests passed.")
+
+if RUN_ONLY is None or RUN_ONLY == 2:
+    print("[2/10] Testing config...")
 
 # ── Blocks ────────────────────────────────────────────────────────────
 print("[3/3] Testing blocks...")
@@ -73,6 +80,9 @@ print("      PASSED ✓")
 
 print("-" * 40)
 print("All tests passed.")
+
+if RUN_ONLY is None or RUN_ONLY == 3:
+    print("[3/10] Testing config...")
 # ── JEPA Model ────────────────────────────────────────────────────────
 print("[4/4] Testing MiniIJEPA...")
 from src.models.jepa import MiniIJEPA
@@ -103,6 +113,9 @@ print("      PASSED ✓")
 
 print("-" * 40)
 print("All tests passed.")
+
+if RUN_ONLY is None or RUN_ONLY == 4:
+    print("[4/10] Testing config...")
 # ── Masking ───────────────────────────────────────────────────────────
 print("[5/5] Testing masking...")
 from src.utils.masking import MultiBlockMaskGenerator
@@ -124,6 +137,9 @@ print("      No context/target overlap: OK")
 assert ctx_idx.shape[0] == 2, "Batch size should be 2"
 assert tgt_idx.shape[0] == 2, "Batch size should be 2"
 print("      PASSED ✓")
+
+if RUN_ONLY is None or RUN_ONLY == 5:
+    print("[5/10] Testing config...")
 # ── Dataset ───────────────────────────────────────────────────────────
 print("[6/6] Testing dataset...")
 from src.data.dataset import STL10JEPADataset, build_dataloader
@@ -152,6 +168,10 @@ print(f"      Batch target     : {tgt.shape}")
 
 assert images.shape == (cfg.batch_size, 3, 224, 224)
 print("      PASSED ✓")
+
+if RUN_ONLY is None or RUN_ONLY == 6:
+    print("[6/10] Testing config...")
+
 # ── Metrics ───────────────────────────────────────────────────────────
 print("[7/7] Testing metrics...")
 from src.training.metrics import AverageMeter, MetricTracker
@@ -173,6 +193,10 @@ assert record["probe_acc"] == 0.423
 print(f"      Epoch record     : {record}")
 print(f"      Best loss        : {tracker.best_loss()}")
 print("      PASSED ✓")
+
+if RUN_ONLY is None or RUN_ONLY == 7:
+    print("[7/10] Testing config...")
+
 # ── Callbacks ─────────────────────────────────────────────────────────
 print("[8/8] Testing callbacks...")
 from src.training.callbacks import (
@@ -204,6 +228,10 @@ runner.on_epoch_end(epoch=5, metrics={"loss": 0.5})
 runner.on_train_end()
 print("      CallbackRunner fan-out   : OK")
 print("      PASSED ✓")
+
+if RUN_ONLY is None or RUN_ONLY == 8:
+    print("[8/10] Testing config...")
+
 # ── Trainer ───────────────────────────────────────────────────────────
 print("[9/9] Testing trainer (2 batches only)...")
 from src.training.trainer import Trainer
@@ -242,3 +270,27 @@ print(f"      Epoch record: {record}")
 assert "loss" in record
 assert record["loss"] > 0
 print("      PASSED ✓")
+
+if RUN_ONLY is None or RUN_ONLY == 9:
+    print("[9/10] Testing config...")
+
+
+# ── Visualize ─────────────────────────────────────────────────────────
+print("[10/10] Testing visualize...")
+from src.utils.visualize import plot_loss_curve, visualize_attention
+
+# test loss curve
+fake_history = [{"epoch": i, "loss": 1.0 - i*0.01} for i in range(1, 11)]
+plot_loss_curve(fake_history, save_path="outputs/test_loss_curve.png")
+
+# test attention map with untrained model
+image, _, _ = dataset[0]
+visualize_attention(model, image, cfg, save_path="outputs/test_attention.png")
+print("      Outputs saved to outputs/")
+print("      PASSED ✓")
+
+print("-" * 40)
+print("All tests passed.")
+
+if RUN_ONLY is None or RUN_ONLY == 10:
+    print("[10/10] Testing config...")
