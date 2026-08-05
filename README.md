@@ -267,8 +267,8 @@ If the encoder learned to output zeros everywhere, the loss would be zero too. T
 
 - [x] Phase 1 — Config + ABCs + Blocks + Full JEPA model
 - [x] Phase 2 — Data pipeline (STL-10)
-- [ ] Phase 3 — Training loop + EMA + callbacks
-- [ ] Phase 4 — Linear probe evaluation + visualisation
+- [x] Phase 3 — Training loop + EMA + callbacks
+- [x] Phase 4 — Linear probe evaluation + visualisation
 
 ---
 
