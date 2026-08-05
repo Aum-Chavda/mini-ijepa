@@ -204,3 +204,41 @@ runner.on_epoch_end(epoch=5, metrics={"loss": 0.5})
 runner.on_train_end()
 print("      CallbackRunner fan-out   : OK")
 print("      PASSED ✓")
+# ── Trainer ───────────────────────────────────────────────────────────
+print("[9/9] Testing trainer (2 batches only)...")
+from src.training.trainer import Trainer
+from src.training.callbacks import CheckpointSaver, EarlyStopping, CallbackRunner
+
+# use a tiny config so test is fast
+from dataclasses import replace
+tiny_cfg = JEPAConfig(
+    epochs=2,
+    warmup_epochs=1,
+    batch_size=4,
+    encoder_depth=2,    # 2 blocks instead of 12 — much faster
+    predictor_depth=2,
+)
+
+# build a tiny model and a small loader
+from src.data.dataset import build_dataloader
+from src.models.jepa import MiniIJEPA
+
+tiny_model  = MiniIJEPA(tiny_cfg).to(device)
+tiny_loader = build_dataloader(tiny_cfg, split="unlabeled")
+
+saver   = CheckpointSaver(tiny_model, save_dir="checkpoints/test")
+stopper = EarlyStopping(patience=5)
+
+trainer = Trainer(
+    model=tiny_model,
+    loader=tiny_loader,
+    cfg=tiny_cfg,
+    callbacks=[saver, stopper],
+)
+
+# run just 1 epoch to verify the loop works
+record = trainer.train_epoch(epoch=1)
+print(f"      Epoch record: {record}")
+assert "loss" in record
+assert record["loss"] > 0
+print("      PASSED ✓")
