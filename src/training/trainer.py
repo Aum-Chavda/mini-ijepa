@@ -123,11 +123,11 @@ class Trainer:
         """
         print(f"Starting training for {self.cfg.epochs} epochs on {self.device}")
         print(f"Trainable params: "
-              f"{sum(p.numel() for p in self.model.parameters() if p.requires_grad):,}")
+            f"{sum(p.numel() for p in self.model.parameters() if p.requires_grad):,}")
 
         for epoch in range(1, self.cfg.epochs + 1):
             record = self.train_epoch(epoch)
-            print(f"  → Epoch {epoch:03d} | loss={record['loss']:.4f}")
+            print(f"  -> Epoch {epoch:03d} | loss={record['loss']:.4f}")
 
             # check early stopping
             for cb in self.callback_runner.callbacks:

@@ -45,11 +45,10 @@ class CheckpointSaver:
                 "model_state": self.model.state_dict(),
             }, path)
             print(f"      [CheckpointSaver] Saved best model at epoch {epoch} "
-                  f"(loss={loss:.4f}) → {path}")
-
+                f"(loss={loss:.4f}) -> {path}")
     def on_train_end(self) -> None:
         print(f"      [CheckpointSaver] Training done. "
-              f"Best loss: {self.best_loss:.4f}")
+                f"Best loss: {self.best_loss:.4f}")
 
 
 class EarlyStopping:
@@ -58,7 +57,7 @@ class EarlyStopping:
     Sets self.should_stop = True when triggered.
     """
 
-    def __init__(self, patience: int = 10):
+    def __init__(self, patience: int = 20):
         self.patience    = patience
         self.best_loss   = float("inf")
         self.epochs_waited = 0
