@@ -272,16 +272,30 @@ If the encoder learned to output zeros everywhere, the loss would be zero too. T
 
 ---
 
-## Results
+### Training Loss Curve
 
-| Metric | Value | Notes |
-|--------|-------|-------|
-| Linear probe (STL-10) | TBD | frozen encoder, 1 epoch head |
-| Training time / epoch | TBD | GTX 1650 Ti, batch=32 |
-| Peak VRAM | TBD | target < 3.5 GB |
+![Training Loss](docs/loss_curve.png)
 
----
----
+Three phases visible:
+- **Epochs 1-2**: fast initial drop at low warmup LR (0.00001→0.00002)
+- **Epochs 3-10**: warmup transition bump as LR ramps to peak (0.00003→0.00005)  
+- **Epochs 11-50**: steady monotonic decline every epoch — cosine decay working correctly
+
+### Attention Maps
+
+**Early training — Run 1 (epoch 2, lr=1e-4):**
+
+![Attention Run 1](docs/attention_run1.png)
+
+After just 2 effective epochs the encoder already clusters attention around the bird's head and body, ignoring background branches. Rich distributed attention across the full image.
+
+**Final model — 50 epochs (lr=1e-5):**
+
+![Attention Final](docs/attention_final.png)
+
+The encoder tracks the fighter jet body and wing outline spatially. Attention concentrates along the aircraft silhouette against the plain sky background — without any labels, the model learned foreground vs background distinction purely from predicting masked patch embeddings.
+
+> Both maps use viridis colormap: **yellow = highest attention**, purple = lowest.
 
 ## Literature Review
 
