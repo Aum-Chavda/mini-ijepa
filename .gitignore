@@ -1,8 +1,36 @@
-data/
+﻿# Training artifacts
+training_log.txt
+epoch_losses.json
+
+# Generated outputs
 outputs/
+
+# Model checkpoints
 checkpoints/
-.venv/
+
+# Dataset
+data/
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
 *.pth
+*.onnx
+*.trt
 
+# Environment
+.venv/
+*.egg-info/
+.uv/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.txt.bak
