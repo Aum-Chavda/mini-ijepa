@@ -11,18 +11,18 @@ from src.models.jepa import MiniIJEPA
 from src.training.metrics import linear_probe
 
 def parse_log(log_path="training_log.txt"):
-    """Extract epoch-level average loss from training log."""
     epoch_losses = {}
-    with open(log_path, "r") as f:
+    with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
         for line in f:
-            # match epoch summary lines
-            match = re.search(r"-> Epoch (\d+) \| loss=([0-9.]+)", line)
-            if match:
-                epoch = int(match.group(1))
-                loss  = float(match.group(2))
-                epoch_losses[epoch] = loss
+            if "->" in line and "Epoch" in line and "loss=" in line and "batch" not in line:
+                try:
+                    parts = line.strip()
+                    epoch = int(parts.split("Epoch")[1].split("|")[0].strip())
+                    loss = float(parts.split("loss=")[1].strip())
+                    epoch_losses[epoch] = loss
+                except:
+                    continue
     return epoch_losses
-
 def plot_loss(epoch_losses, save_path="outputs/loss_curve.png"):
     os.makedirs("outputs", exist_ok=True)
     epochs = sorted(epoch_losses.keys())

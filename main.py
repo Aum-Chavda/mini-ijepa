@@ -10,11 +10,12 @@ def main():
     # ── Config ────────────────────────────────────────────────────────
     cfg = JEPAConfig(
         epochs=50,
-        warmup_epochs=3,
+        warmup_epochs=2,
         batch_size=32,
         encoder_depth=12,
         predictor_depth=4,
-        lr=1e-4,
+        lr=5e-5,
+        weight_decay=0.05,
         device="cuda" if torch.cuda.is_available() else "cpu",
         data_dir="data/",
         checkpoint_dir="checkpoints/",
@@ -49,7 +50,7 @@ def main():
     # ── Callbacks ─────────────────────────────────────────────────────
     callbacks = [
         CheckpointSaver(model, save_dir=cfg.checkpoint_dir),
-        EarlyStopping(patience=15),
+        EarlyStopping(patience=45),
     ]
 
     # ── Trainer ───────────────────────────────────────────────────────

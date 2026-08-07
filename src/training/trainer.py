@@ -149,3 +149,4 @@ class Trainer:
         valid_counts = (indices >= 0).sum(dim=1)  # [B]
         min_valid = valid_counts.min().item()
         return indices[:, :min_valid]
+

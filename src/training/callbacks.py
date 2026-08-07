@@ -57,7 +57,7 @@ class EarlyStopping:
     Sets self.should_stop = True when triggered.
     """
 
-    def __init__(self, patience: int = 20):
+    def __init__(self, patience: int = 30):
         self.patience    = patience
         self.best_loss   = float("inf")
         self.epochs_waited = 0
