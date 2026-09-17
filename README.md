@@ -246,7 +246,7 @@ ONE IMAGE [3, 224, 224]
 
 If the encoder learned to output zeros everywhere, the loss would be zero too. Two mechanisms prevent this:
 
-**EMA asymmetry** — the context and target encoders are never the same network. The target is always lagging behind. The context encoder cannot trivially copy the target — it has to predict a moving reference.
+**EMA asymmetry** — the context and target encoders are never the same network. The target is always lagging behind. The context encoder cannot trivially copy the target — it has to predict a moving reference it is to avoid the collapse.
 
 **Predictor bottleneck** — the predictor is intentionally small (4 blocks, 96 dims vs 192). It cannot memorise — it must generalise. The only way to predict accurately is to build truly semantic representations.
 
